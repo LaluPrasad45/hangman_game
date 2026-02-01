@@ -1,0 +1,7 @@
+python
+flask
+developer
+hangman
+programming
+algorithm
+computer
