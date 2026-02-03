@@ -1,7 +1,3 @@
-python
-flask
-developer
-hangman
-programming
-algorithm
-computer
+easy:cat,dog,ball,tree,fish
+medium:python,flask,random,object
+hard:algorithm,developer,computer,framework

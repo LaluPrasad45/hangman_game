@@ -2,22 +2,33 @@ from flask import Flask, render_template, request, redirect, url_for, session
 import random
 
 app = Flask(__name__)
-app.secret_key = "hangman_secret_key"  # required for session
+app.secret_key = "hangman_secret_key"
 
-MAX_LIVES = 6
+DIFFICULTY_LIVES = {
+    "easy": 8,
+    "medium": 6,
+    "hard": 4
+}
 
 
-def load_word():
+def load_words():
+    levels = {}
     with open("words.txt", "r") as f:
-        words = f.read().splitlines()
-    return random.choice(words).lower()
+        for line in f:
+            level, words = line.strip().split(":")
+            levels[level] = words.split(",")
+    return levels
 
 
-def init_game():
-    session["word"] = load_word()
+WORDS = load_words()
+
+
+def init_game(level="medium"):
+    session["level"] = level
+    session["word"] = random.choice(WORDS[level]).lower()
     session["guessed"] = []
     session["wrong"] = []
-    session["lives"] = MAX_LIVES
+    session["lives"] = DIFFICULTY_LIVES[level]
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -28,18 +39,28 @@ def index():
     message = ""
 
     if request.method == "POST":
+        if "level" in request.form:
+            init_game(request.form["level"])
+            return redirect(url_for("index"))
+
         guess = request.form.get("guess", "").lower()
 
-        # Validation
         if not guess.isalpha() or len(guess) != 1:
             message = "Enter a single valid letter."
         elif guess in session["guessed"] or guess in session["wrong"]:
-            message = "You already guessed that letter."
+            message = "Already guessed."
         elif guess in session["word"]:
-            session["guessed"].append(guess)
+            guessed = session["guessed"]
+            guessed.append(guess)
+            session["guessed"] = guessed
         else:
-            session["wrong"].append(guess)
+            wrong = session["wrong"]
+            wrong.append(guess)
+            session["wrong"] = wrong
             session["lives"] -= 1
+
+
+        
 
     word = session["word"]
     display_word = " ".join([c if c in session["guessed"] else "_" for c in word])
@@ -56,7 +77,8 @@ def index():
         win=win,
         lose=lose,
         word=word,
-        message=message
+        message=message,
+        level=session["level"]
     )
 
 

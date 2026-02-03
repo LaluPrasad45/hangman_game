@@ -1,33 +1,35 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Hangman Game</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-</head>
-<body>
-    <h1>Hangman Game</h1>
+<h1>Hangman Game</h1>
 
-    <p class="word">{{ display_word }}</p>
+<form method="post">
+    <label>Select Difficulty:</label>
+    <select name="level">
+        <option value="easy">Easy</option>
+        <option value="medium" selected>Medium</option>
+        <option value="hard">Hard</option>
+    </select>
+    <button type="submit">Start</button>
+</form>
 
-    <p>Lives left: {{ lives }}</p>
-    <p>Wrong guesses: {{ wrong|join(', ') }}</p>
+<p>Current level: {{ level }}</p>
 
-    {% if message %}
-        <p class="message">{{ message }}</p>
-    {% endif %}
+<p class="word">{{ display_word }}</p>
+<p>Lives left: {{ lives }}</p>
+<p>Wrong guesses: {{ wrong|join(', ') }}</p>
 
-    {% if win %}
-        <h2>You won 🎉</h2>
-        <a href="/reset">Play Again</a>
-    {% elif lose %}
-        <h2>You lost 😢</h2>
-        <p>The word was: <b>{{ word }}</b></p>
-        <a href="/reset">Try Again</a>
-    {% else %}
-        <form method="post">
-            <input type="text" name="guess" maxlength="1" required>
-            <button type="submit">Guess</button>
-        </form>
-    {% endif %}
-</body>
-</html>
+{% if message %}
+<p class="message">{{ message }}</p>
+{% endif %}
+
+{% if win %}
+<h2>You won 🎉</h2>
+<a href="/reset">Play Again</a>
+{% elif lose %}
+<h2>You lost 😢</h2>
+<p>The word was: <b>{{ word }}</b></p>
+<a href="/reset">Try Again</a>
+{% else %}
+<form method="post">
+    <input type="text" name="guess" maxlength="1" required>
+    <button type="submit">Guess</button>
+</form>
+{% endif %}
